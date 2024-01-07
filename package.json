@@ -1,8 +1,8 @@
 {
-  "name": "aocrunner",
-  "version": "1.9.6",
-  "repository": "https://github.com/caderek/aocrunner",
-  "description": "Advent of Code runner",
+  "name": "aoc-automation",
+  "version": "1.0.0",
+  "repository": "https://github.com/terryaney/aoc-automation",
+  "description": "Advent of Code tool to automate the repetitive parts of AoC.",
   "main": "lib/index.js",
   "bin": "lib/cli.js",
   "type": "module",
@@ -16,10 +16,11 @@
     "aoc",
     "advent of code",
     "runner",
+    "automation",
     "template",
     "advent"
   ],
-  "author": "Maciej Caderek",
+  "author": "Terry Aney",
   "license": "ISC",
   "devDependencies": {
     "@types/common-tags": "^1.8.1",
