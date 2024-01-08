@@ -62,7 +62,6 @@ const init = async () => {
     save(dir, ".prettierignore", prettierignoreTXT(setup))
     save(dir, ".env", envTXT)
     save(dir, "README.md", readmeMD(setup, startCmd, installCmd))
-	save(dir, ".aoc-data.json", config)
     
     if (setup.language === "ts") {
       save(dir, "tsconfig.json", tsconfigJSON(setup))
@@ -74,7 +73,9 @@ const init = async () => {
 	  }
 	}
   
-    const templatesDir = path.resolve(
+	save(srcDir, ".aoc-data.json", config)
+
+	const templatesDir = path.resolve(
       dirname,
       "..",
       "..",
