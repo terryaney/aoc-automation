@@ -52,7 +52,7 @@ const init = async () => {
   const config = runnerJSON(setup)
 
   if (fs.existsSync(dir)) {
-    console.log("AOCRunner Project already exists.")
+    console.log("AoC Automation Project already exists.")
   }
   else {
 	fs.mkdirSync(srcDir, { recursive: true })
@@ -62,7 +62,7 @@ const init = async () => {
     save(dir, ".prettierignore", prettierignoreTXT(setup))
     save(dir, ".env", envTXT)
     save(dir, "README.md", readmeMD(setup, startCmd, installCmd))
-	save(dir, ".aocrunner.json", config)
+	save(dir, ".aoc-data.json", config)
     
     if (setup.language === "ts") {
       save(dir, "tsconfig.json", tsconfigJSON(setup))

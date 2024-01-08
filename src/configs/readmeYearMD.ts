@@ -90,7 +90,7 @@ const readmeYearMD = (
     [![AoC](https://badgen.net/badge/AoC/${config.year}/blue)](https://adventofcode.com/${config.year})
     [![Node](https://badgen.net/badge/Node/v16.13.0+/blue)](https://nodejs.org/en/download/)
     ![Language](https://badgen.net/badge/Language/${lang}/blue)
-    [![Template](https://badgen.net/badge/Template/aocrunner/blue)](https://github.com/caderek/aocrunner)
+    [![Template](https://badgen.net/badge/Template/aoc-automation/blue)](https://github.com/terryaney/aoc-automation)
 
     # 🎄 Advent of Code ${config.year} 🎄
 

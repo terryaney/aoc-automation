@@ -1,4 +1,4 @@
-import run from "aocrunner"
+import run from "aoc-automation"
 
 const parseInput = (rawInput) => rawInput
 

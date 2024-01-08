@@ -2,26 +2,26 @@ import type { Setup } from "../types/common"
 import version from "../version.js"
 
 const packageJSON = ({ year, language, author }: Setup) => {
-  const build = language === "ts" ? { build: "aocrunner build" } : {}
+  const build = language === "ts" ? { build: "aoc-automation build" } : {}
   const esbuild = language === "ts" ? { esbuild: "^0.19.8" } : {}
   
   return {
-    name: `aoc${year}`,
+    name: "AdventOfCode",
     version: "1.0.0",
-    description: `Advent of Code ${year} - solutions`,
+    description: `Advent of Code Solutions`,
     type: "module",
     scripts: {
-      start: "aocrunner day",
+      start: "aoc-automation day",
       ...build,
       format: "prettier -w src",
-      "update:readme": "aocrunner update:readme",
+      "update:readme": "aoc-automation update:readme",
     },
     keywords: ["aoc"],
     author: author ?? "",
     license: "ISC",
     devDependencies: {
       "@types/node": "^16.11.6",
-      aocrunner: `^${version}`,
+      "aoc-automation": `^${version}`,
 	  ...esbuild,
       prettier: "^2.8.0",
     },

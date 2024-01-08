@@ -4,7 +4,7 @@ import { writeFileSync, existsSync, statSync } from "fs"
 import kleur from "kleur"
 
 const USER_AGENT_HEADER = {
-  "User-Agent": "github.com/caderek/aocrunner by maciej.caderek@gmail.com",
+  "User-Agent": "github.com/terryaney/aoc-automation by terry.aney@icloud.com",
 }
 
 const strToNum = (time: string) => {

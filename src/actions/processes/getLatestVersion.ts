@@ -2,7 +2,7 @@ import { exec } from "child_process"
 
 const getLatestVersion = (): Promise<string | null> => {
   return new Promise((resolve) => {
-    exec("npm view aocrunner versions --json", (err, stdout) => {
+    exec("npm view aoc-automation versions --json", (err, stdout) => {
       if (err) {
         resolve(null)
       }

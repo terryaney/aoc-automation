@@ -1,6 +1,6 @@
 import type { Setup, Config, DayConfig } from "../types/common"
 
-const aocrunnerDaysJSON = (): DayConfig[] => new Array(25).fill(0).map((_, i) => ({
+const aocAutomationDaysJSON = (): DayConfig[] => new Array(25).fill(0).map((_, i) => ({
 	title: null,
 	part1: {
 		solved: false,
@@ -16,7 +16,7 @@ const aocrunnerDaysJSON = (): DayConfig[] => new Array(25).fill(0).map((_, i) =>
 	},
 }));
 
-const aocrunnerJSON = ({ year, packageManager, language }: Setup): Config => {
+const aocAutomationDataJSON = ({ year, packageManager, language }: Setup): Config => {
   return {
     version: 1,
     language,
@@ -24,11 +24,11 @@ const aocrunnerJSON = ({ year, packageManager, language }: Setup): Config => {
 	years: [
 		{
 			year,
-			days: aocrunnerDaysJSON()
+			days: aocAutomationDaysJSON()
 		}
 	]
   }
 }
 
-export { aocrunnerDaysJSON }
-export default aocrunnerJSON
+export { aocAutomationDaysJSON }
+export default aocAutomationDataJSON

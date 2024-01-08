@@ -9,7 +9,7 @@ import runSolution from "./processes/runSolution.js"
 import getLatestVersion from "./processes/getLatestVersion.js"
 import copy from "../io/copy.js"
 import save from "../io/save.js"
-import { aocrunnerDaysJSON } from "../configs/runnerJSON.js"
+import { aocAutomationDaysJSON } from "../configs/runnerJSON.js"
 import { readConfig, saveConfig } from "../io/config.js"
 import { getInput, getPuzzleInfo, sendSolution, Status } from "../io/api.js"
 import readmeYearMD from "../configs/readmeYearMD.js"
@@ -62,7 +62,7 @@ const showInfo = () => {
 
     console.log(
       `To update, close the runner and run`,
-      kleur.bold().green("npm i aocrunner"),
+      kleur.bold().green("npm i aoc-automation"),
     )
   }
 
@@ -154,7 +154,7 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
   const yearNum = Number(year);
   const dayNum = Number(day);
 
-  if (yearNum < 2015 || yearNum > new Date().getFullYear()) {
+  if (yearNum < 2015 || yearNum > today.getFullYear()) {
     console.log(kleur.red(`Wrong year - choose year between 2015 and ${new Date().getFullYear()}.`))
     process.exit(1)
   }
@@ -168,11 +168,13 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
   if (configYear == undefined) {
 	const yearDir = path.join("src", year);
 	fs.mkdirSync(yearDir, { recursive: true })
-    config.years.push(configYear = { year: yearNum, days: aocrunnerDaysJSON() });
+    config.years.push(configYear = { year: yearNum, days: aocAutomationDaysJSON() });
 	config.years.sort((a, b) => a.year - b.year);
 	saveConfig(config);
 	save(yearDir, "README.md", readmeYearMD(config.language, config.years.find(y => y.year === Number(year))!))
   }
+
+  console.log(`Starting ${year} Day ${day}...`)
 
   const dayDir = `day${String(dayNum).padStart(2, "0")}`
   const fromDir = path.join("src", "template")
@@ -245,7 +247,7 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
     console.clear()
 
     if (config.language === "ts") {
-      buildSource(year, file)
+      buildSource(year!, file)
     }
 
     runSolution(dayNum, indexFile)
