@@ -1,7 +1,8 @@
 export type Setup = {
 	name: string
     year: number
-    language: "ts" | "js"
+	language: "ts" | "js"
+	vscodeSettings?: boolean
 	packageManager: "npm" | "yarn" | "pnpm"
 	author: string
 	semicolons: boolean

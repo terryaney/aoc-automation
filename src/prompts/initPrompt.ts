@@ -35,7 +35,7 @@ const initPrompt = () => {
         type: "text",
         name: "name",
         message: "Directory name",
-        initial: (prev) => `aoc${prev}`,
+        initial: "AdventOfCode",
       },
       {
         type: "select",
@@ -52,6 +52,14 @@ const initPrompt = () => {
         name: "strict",
         message: "Strict mode",
         initial: true,
+        active: "yes",
+        inactive: "no",
+      },
+      {
+        type: (_, values) => (values.language === "ts" ? "toggle" : null),
+        name: "vscodeSettings",
+        message: "(Optional) Would you like to include the default VS Code launch.json configuration to support debugging Typescript files?",
+        initial: false,
         active: "yes",
         inactive: "no",
       },
@@ -79,7 +87,7 @@ const initPrompt = () => {
           { title: "pnpm", value: "pnpm" },
         ],
         initial: 0,
-      },
+      }
     ],
     { onCancel },
   )

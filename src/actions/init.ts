@@ -7,6 +7,7 @@ import initPrompt from "../prompts/initPrompt.js"
 import save from "../io/save.js"
 import copy from "../io/copy.js"
 import packageJSON from "../configs/packageJSON.js"
+import launchJSON from "../configs/launchJSON.js"
 import tsconfigJSON from "../configs/tsconfigJSON.js"
 import prettierJSON from "../configs/prettierJSON.js"
 import gitignoreTXT from "../configs/gitignoreTXT.js"
@@ -65,7 +66,13 @@ const init = async () => {
     
     if (setup.language === "ts") {
       save(dir, "tsconfig.json", tsconfigJSON(setup))
-    }
+
+	  if (setup.vscodeSettings) {
+		const vscodeSettingsDir = path.join(dir, ".vscode")
+		fs.mkdirSync(vscodeSettingsDir, { recursive: true })
+		save(vscodeSettingsDir, "launch.json", launchJSON())
+	  }
+	}
   
     const templatesDir = path.resolve(
       dirname,
