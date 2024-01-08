@@ -1,6 +1,8 @@
-# AoC Runner
+# AoC Automation
 
-This repo contains the utility library to create and run [Advent of Code](https://adventofcode.com/2022/about) solutions.
+This repo contains the utility library to automate the repetitive tasks while solving [Advent of Code](https://adventofcode.com/2023/about) solutions.
+
+It is fork from [caderek/aocrunner](https://github.com/caderek/aocrunner) which seems to be no longer maintained.  There are various minor improvements, but the primary motivation was support for multiple AoC years within one repository as I didn't want to have separate repositories and duplicated `node_modules` for each AoC year.  See [my repo](https://github.com/terryaney/advent-of-code) for idea of how the years are supported.
 
 ---
 
@@ -16,12 +18,32 @@ This repo contains the utility library to create and run [Advent of Code](https:
 - Takes care of loading the input, measuring solution time, and running simple unit tests (supports async and sync code).
 - Automatically creates and updates global, year, and day README files.
 
+## Changes from `aocrunner`
+
+You can review the original [npm package](https://www.npmjs.com/package/aocrunner) and repository, but at the time of creation, the following improvements and changes were made:
+
+1. Instead of replicating `aocrunner` every year, each year is nested under `src\NNNN` where `NNNN` is the year.
+	1. `npm start` now requires a year and day parameter, e.g. `npm start 2019 1`
+	1. `update:readme` now requires a year parameter, e.g. `npm run update:readme 2019`
+	1. `build` now requires a year parameter, e.g. `npm run build 2019`
+
+1. Readme improvements
+	1. There is a global readme summarizing 'year' results.
+	1. Each year has a readme summarizing 'day' results (mostly same as before with some typo fixes/formatting).
+	1. Each day has a readme summarizing solutions in the `Results` section.
+	1. The year and day readmes also pull the puzzle/day titles.
+	1. Same as the previous year readme, the global and day readmes automatically update when submitting solutions (or when `update:readme` is ran).
+
+1. Puzzle automation improvements
+	1. Puzzle title is pulled and stored in readme files and `.aocrunner.json` file.
+	1. The sample input is attempted to be pulled and if successful and a `{testData}` placeholder is found in the template `index.ts` file, it will be replaced with the sample input.
+
 ## Installation
 
 To create the AoC solutions project run (requires Node 16 LTS or higher: `v16.13.0+`):
 
 ```
-npx aocrunner init
+npx aoc-automation init
 ```
 
 It will guide you through the configuration with simple CLI menu.
@@ -46,16 +68,6 @@ yarn start 2023 1
 pnpm start 2023 1
 ```
 
-## Join my leaderboard
-
-You can [join](https://adventofcode.com/2022/leaderboard/private) my private leaderboard for JS/TS programmers:
-
-Code:
-
-```
-107172-b51ab08f
-```
-
 ## Note about automated requests
 
 AoC Runner respects [the concerns of the AoC creator](https://www.reddit.com/r/adventofcode/comments/3v64sb/aoc_is_fragile_please_be_gentle/), and does not send unnecessary requests. In fact, it reduces the number of requests sent to the AoC server when compared to doing things manually:
@@ -65,7 +77,7 @@ AoC Runner respects [the concerns of the AoC creator](https://www.reddit.com/r/a
 - it prevents you from sending empty solutions or solutions that are not strings/numbers,
 - when you send an incorrect solution, it locally keeps track of the remaining time before you can send another solution, so the server is not spammed with premature attempts.
 
-Starting from version 1.7.0 AoC Runner sets the correct request header as [requested](https://www.reddit.com/r/adventofcode/comments/z9dhtd/please_include_your_contact_info_in_the_useragent/) by AoC creator. If you use an older version, please upgrade.
+AoC Automation sets the correct request header as [requested](https://www.reddit.com/r/adventofcode/comments/z9dhtd/please_include_your_contact_info_in_the_useragent/) by AoC creator.
 
 ## Note about ES Modules
 
@@ -291,6 +303,19 @@ run({
   onlyTests: true, // <- Yay! Comment this line to quickly switch mode.
 })
 ```
+
+## `aocrunner` Final Notes
+
+I attribute the vast majority of this repository to [Maciej Caderek](https://github.com/caderek) and am happy to [resubmit a PR](https://github.com/caderek/aocrunner/pull/31) if he would prefer that.  Given the timings of the last commits, it appears the project is serving him well as is and may not be interested in managing the repository and its PRs.  I will continue to maintain this repository and accept PRs as long as Maciej is okay with it.
+
+My first commit that modified his code base is [5892937](https://github.com/terryaney/aoc-automation/commit/58929376f1938abdd994402b2e7a5a23e8f4a17e).
+
+I've included the following PR code into my repository as well as I liked their suggestions:
+
+1. [#30](https://github.com/caderek/aocrunner/pull/30) - Add missing dep esbuild on init
+1. [#28](https://github.com/caderek/aocrunner/pull/28) - Make solution URI-safe when sending to API
+1. [#20](https://github.com/caderek/aocrunner/pull/20) - Add VS Code launch.json config - However, I only support debugging Typescript files and no prompt required, it just debugs the currently active file.
+1. [#19](https://github.com/caderek/aocrunner/pull/19) - Add current day if not specificed in start - However, no prompt, it just attempts to use current year/day combo.
 
 ## License
 
