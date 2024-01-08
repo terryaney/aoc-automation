@@ -139,21 +139,29 @@ const send = async (config: Config, yearNum: number, dayNum: number, part: 1 | 2
 }
 
 const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
-  const year = yearRaw && (yearRaw.match(/\d{4}/) ?? [])[0]
-  const day = dayRaw && (dayRaw.match(/\d+/) ?? [])[0]
-
+  let year = yearRaw && (yearRaw.match(/\d{4}/) ?? [])[0]
+  let day = dayRaw && (dayRaw.match(/\d+/) ?? [])[0]
+  const today = new Date();
+  
   if (year === undefined) {
-    console.log(kleur.red("No year specified."))
-    process.exit(1)
+    year = today.getFullYear().toString();
   }
   if (day === undefined) {
-    console.log(kleur.red("No day specified."))
-    process.exit(1)
+    day = today.getDate().toString();
   }
 
   const config = readConfig();
   const yearNum = Number(year);
   const dayNum = Number(day);
+
+  if (yearNum < 2015 || yearNum > new Date().getFullYear()) {
+    console.log(kleur.red(`Wrong year - choose year between 2015 and ${new Date().getFullYear()}.`))
+    process.exit(1)
+  }
+  if (dayNum < 1 || dayNum > 25) {
+    console.log(kleur.red("Wrong day - choose day between 1 and 25."))
+    process.exit(1)
+  }
 
   let configYear = config.years.find(y => y.year == yearNum);
 
@@ -164,15 +172,6 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
 	config.years.sort((a, b) => a.year - b.year);
 	saveConfig(config);
 	save(yearDir, "README.md", readmeYearMD(config.language, config.years.find(y => y.year === Number(year))!))
-  }
-
-  if (yearNum < 2015 || yearNum > new Date().getFullYear()) {
-    console.log(kleur.red(`Wrong year - choose year between 2015 and ${new Date().getFullYear()}.`))
-    process.exit(1)
-  }
-  if (dayNum < 1 || dayNum > 25) {
-    console.log(kleur.red("Wrong day - choose day between 1 and 25."))
-    process.exit(1)
   }
 
   const dayDir = `day${String(dayNum).padStart(2, "0")}`
