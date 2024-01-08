@@ -6,7 +6,7 @@ const packageJSON = ({ year, language, author }: Setup) => {
   const esbuild = language === "ts" ? { esbuild: "^0.19.8" } : {}
   
   return {
-    name: "AdventOfCode",
+    name: "advent-of-code",
     version: "1.0.0",
     description: `Advent of Code Solutions`,
     type: "module",
