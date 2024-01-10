@@ -1,12 +1,13 @@
 export type Setup = {
-	name: string
-    year: number
-	language: "ts" | "js"
-	vscodeSettings?: boolean
-	packageManager: "npm" | "yarn" | "pnpm"
-	author: string
-	semicolons: boolean
-	strict: boolean
+  name: string
+  year: number
+  language: "ts" | "js"
+  vscodeSettings?: boolean
+  packageManager: "npm" | "yarn" | "pnpm"
+  packageManagerVersion?: string
+  author: string
+  semicolons: boolean
+  strict: boolean
 }
 
 type PartConfig = {
@@ -15,12 +16,11 @@ type PartConfig = {
   attempts: any[]
   time: null | number
 }
-  
-  
+
 export type DayConfig = {
-  title: null | string;
-  part1: PartConfig; 
-  part2: PartConfig 
+  title: null | string
+  part1: PartConfig
+  part2: PartConfig
 }
 
 export type YearConfig = {

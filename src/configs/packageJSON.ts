@@ -1,10 +1,19 @@
 import type { Setup } from "../types/common"
 import version from "../version.js"
 
-const packageJSON = ({ year, language, author }: Setup) => {
+const packageJSON = ({
+  language,
+  author,
+  packageManager,
+  packageManagerVersion,
+}: Setup) => {
   const build = language === "ts" ? { build: "aoc-automation build" } : {}
   const esbuild = language === "ts" ? { esbuild: "^0.19.8" } : {}
-  
+  const preferredPackageManager =
+    packageManager && Boolean(packageManagerVersion)
+      ? { packageManager: `^${packageManager}@${packageManagerVersion}` }
+      : {}
+
   return {
     name: "advent-of-code",
     version: "1.0.0",
@@ -22,13 +31,14 @@ const packageJSON = ({ year, language, author }: Setup) => {
     devDependencies: {
       "@types/node": "^16.11.6",
       "aoc-automation": `^${version}`,
-	  ...esbuild,
+      ...esbuild,
       prettier: "^2.8.0",
     },
     dependencies: {},
     engines: {
       node: ">=16.13.0",
     },
+    ...preferredPackageManager,
   }
 }
 

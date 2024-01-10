@@ -26,26 +26,35 @@ const init = async () => {
 
   const setup: Setup = await initPrompt()
 
-  const installCmd =
-    setup.packageManager === "npm"
-      ? "npm i"
-      : setup.packageManager === "yarn"
-      ? "yarn"
-      : "pnpm install"
+  const packageManagers = {
+    npm: {
+      install: "npm i",
+      format: "npm run format",
+      start: "npm start",
+      version: "npm -v",
+    },
+    yarn: {
+      install: "yarn",
+      format: "yarn format",
+      start: "yarn start",
+      version: "yarn -v",
+    },
+    pnpm: {
+      install: "pnpm install",
+      format: "pnpm format",
+      start: "pnpm start",
+      version: "pnpm -v",
+    },
+  }
 
-  const formatCmd =
-    setup.packageManager === "npm"
-      ? "npm run format"
-      : setup.packageManager === "yarn"
-      ? "yarn format"
-      : "pnpm format"
-
-  const startCmd =
-    setup.packageManager === "npm"
-      ? "npm start"
-      : setup.packageManager === "yarn"
-      ? "yarn start"
-      : "pnpm start"
+  const installCmd = packageManagers[setup.packageManager].install
+  const formatCmd = packageManagers[setup.packageManager].format
+  const startCmd = packageManagers[setup.packageManager].start
+  setup.packageManagerVersion = execSync(
+    packageManagers[setup.packageManager].version,
+  )
+    .toString()
+    .trim()
 
   const dir = setup.name
   const srcDir = path.join(dir, "src")
@@ -53,41 +62,40 @@ const init = async () => {
 
   if (fs.existsSync(dir)) {
     console.log("AoC Automation Project already exists.")
-  }
-  else {
-	fs.mkdirSync(srcDir, { recursive: true })
+  } else {
+    fs.mkdirSync(srcDir, { recursive: true })
     save(dir, "package.json", packageJSON(setup))
     save(dir, ".prettierrc.json", prettierJSON(setup))
     save(dir, ".gitignore", gitignoreTXT(setup))
     save(dir, ".prettierignore", prettierignoreTXT(setup))
     save(dir, ".env", envTXT)
     save(dir, "README.md", readmeMD(setup, startCmd, installCmd))
-    
+
     if (setup.language === "ts") {
       save(dir, "tsconfig.json", tsconfigJSON(setup))
 
-	  if (setup.vscodeSettings) {
-		const vscodeSettingsDir = path.join(dir, ".vscode")
-		fs.mkdirSync(vscodeSettingsDir, { recursive: true })
-		save(vscodeSettingsDir, "launch.json", launchJSON())
-	  }
-	}
-  
-	save(srcDir, ".aoc-data.json", config)
+      if (setup.vscodeSettings) {
+        const vscodeSettingsDir = path.join(dir, ".vscode")
+        fs.mkdirSync(vscodeSettingsDir, { recursive: true })
+        save(vscodeSettingsDir, "launch.json", launchJSON())
+      }
+    }
 
-	const templatesDir = path.resolve(
+    save(srcDir, ".aoc-data.json", config)
+
+    const templatesDir = path.resolve(
       dirname,
       "..",
       "..",
       "templates",
       setup.language,
     )
-  
+
     copy(templatesDir, srcDir)
-  
+
     console.log("\nInstalling dependencies...\n")
     execSync(installCmd, { cwd: dir, stdio: "inherit" })
-  
+
     console.log("\nFormatting the source files...\n")
     execSync(formatCmd, { cwd: dir, stdio: "inherit" })
   }
@@ -96,10 +104,16 @@ const init = async () => {
 
   if (fs.existsSync(yearDir)) {
     console.log(`Year ${setup.year} Project already exists.`)
-  }
-  else {
-	fs.mkdirSync(yearDir, { recursive: true })
-	save(yearDir, "README.md", readmeYearMD(setup.language, config.years.find(y => y.year === setup.year)!))
+  } else {
+    fs.mkdirSync(yearDir, { recursive: true })
+    save(
+      yearDir,
+      "README.md",
+      readmeYearMD(
+        setup.language,
+        config.years.find((y) => y.year === setup.year)!,
+      ),
+    )
   }
 
   console.log(
