@@ -1,8 +1,10 @@
-import { stripIndents } from "common-tags"
+import { stripIndents } from "common-tags";
 
 const readmeDayMD = (year: number, day: number, title: string | null) => {
-  return stripIndents`
-    # 🎄 Advent of Code ${year} - Day ${day} ${title != null ? "- " + title : ""} 🎄
+	return stripIndents`
+    # 🎄 Advent of Code ${year} - Day ${day} ${
+		title != null ? "- " + title : ""
+	} 🎄
 
     ## Info
 
@@ -19,7 +21,7 @@ const readmeDayMD = (year: number, day: number, title: string | null) => {
     ## Notes
 
     ...
-  `
-}
+  `;
+};
 
-export default readmeDayMD
+export default readmeDayMD;

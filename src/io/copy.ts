@@ -1,7 +1,7 @@
-import fs from "fs"
+import fs from "fs";
 
 const copy = (fromDir: string, toDir: string) => {
-  fs.cpSync(fromDir, toDir, { recursive: true })
-}
+	fs.cpSync(fromDir, toDir, { recursive: true });
+};
 
-export default copy
+export default copy;

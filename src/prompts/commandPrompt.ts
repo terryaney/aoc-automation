@@ -1,21 +1,21 @@
-import prompts from "prompts"
-import kleur from "kleur"
+import prompts from "prompts";
+import kleur from "kleur";
 
 const onCancel = () => {
-  process.exit()
-}
+	process.exit();
+};
 
 const commandPrompt = () => {
-  return prompts(
-    [
-      {
-        type: "text",
-        name: "command",
-        message: ``,
-      },
-    ],
-    { onCancel },
-  )
-}
+	return prompts(
+		[
+			{
+				type: "text",
+				name: "command",
+				message: ``,
+			},
+		],
+		{ onCancel },
+	);
+};
 
-export default commandPrompt
+export default commandPrompt;

@@ -1,3 +1,3 @@
-const envTXT = "AOC_SESSION_KEY="
+const envTXT = "AOC_SESSION_KEY=";
 
-export default envTXT
+export default envTXT;

@@ -1,7 +1,7 @@
-import type { Setup, YearConfig } from "../types/common"
-import { stripIndents } from "common-tags"
-import toFixed from "../utils/toFixed.js"
-import { readGlobalReadme } from "../io/readme.js"
+import type { Setup, YearConfig } from "../types/common";
+import { stripIndents } from "common-tags";
+import toFixed from "../utils/toFixed.js";
+import { readGlobalReadme } from "../io/readme.js";
 
 const renderGlobalYearInfo = (config: YearConfig) => {
 	try {
@@ -21,11 +21,15 @@ const renderGlobalYearInfo = (config: YearConfig) => {
 					totalTime += part2.time ?? 0;
 				}
 				const star =
-					part1.solved && part2.solved ? "★" :
-						part1.solved || part2.solved ? "☆" : "⭒";
-	
+					part1.solved && part2.solved
+						? "★"
+						: part1.solved || part2.solved
+						? "☆"
+						: "⭒";
+
 				return star;
-			}).join("");
+			})
+			.join("");
 
 		let regex = /<!--SOLUTIONS-->([\s\S]+?)<!--\/SOLUTIONS-->/;
 		let match = globalReadme.match(regex);
@@ -33,17 +37,21 @@ const renderGlobalYearInfo = (config: YearConfig) => {
 		let results = "";
 
 		if (match != null) {
-			const lines = match[1].split("\n").filter(line => line.trim() != "");
-	
-			let yearReplaceIndex = lines.findIndex(line => line.includes(`badge/${currentYear}`));
-	
+			const lines = match[1]
+				.split("\n")
+				.filter(line => line.trim() != "");
+
+			let yearReplaceIndex = lines.findIndex(line =>
+				line.includes(`badge/${currentYear}`),
+			);
+
 			if (yearReplaceIndex == -1) {
 				// Find position...
 				let yearInsertIndex = -1;
 				for (let index = 0; index < lines.length; index++) {
 					const [left, right] = lines[index].split("badge/");
 					if (right != undefined) {
-						if ( Number(right.substring(0, 4)) < currentYear ) {
+						if (Number(right.substring(0, 4)) < currentYear) {
 							yearInsertIndex = index;
 							break;
 						}
@@ -54,16 +62,23 @@ const renderGlobalYearInfo = (config: YearConfig) => {
 					yearInsertIndex = lines.length;
 				}
 
-				lines.splice(yearReplaceIndex = yearInsertIndex, 0, "");
+				lines.splice((yearReplaceIndex = yearInsertIndex), 0, "");
 			}
-		
+
 			if (totalStars >= 49) {
-				stars = stars.replaceAll("★", "✨")
+				stars = stars.replaceAll("★", "✨");
 			}
-			const color = totalStars >= 40 ? "green" : totalStars >= 20 ? "yellow" : "gray";
-		
-			lines[yearReplaceIndex] = `[![Year](https://badgen.net/badge/${currentYear}/${stars}/${color}?icon=typescript&labelColor=blue&scale=1.3)](src/${currentYear})  `;
-		
+			const color =
+				totalStars >= 40
+					? "green"
+					: totalStars >= 20
+					? "yellow"
+					: "gray";
+
+			lines[
+				yearReplaceIndex
+			] = `[![Year](https://badgen.net/badge/${currentYear}/${stars}/${color}?icon=typescript&labelColor=blue&scale=1.3)](src/${currentYear})  `;
+
 			badges = lines.join("\n");
 		}
 
@@ -72,7 +87,9 @@ const renderGlobalYearInfo = (config: YearConfig) => {
 
 		if (match != null) {
 			let lines = match[1].split("\n");
-			const firstContentIndex = lines.findIndex(line => line.trim() !== "");
+			const firstContentIndex = lines.findIndex(
+				line => line.trim() !== "",
+			);
 			let lastContentIndex = -1;
 			for (let index = lines.length - 1; index >= 0; index--) {
 				const line = lines[index];
@@ -82,16 +99,18 @@ const renderGlobalYearInfo = (config: YearConfig) => {
 				}
 			}
 			lines = lines.slice(firstContentIndex, lastContentIndex + 1);
-	
-			let yearReplaceIndex = lines.findIndex(line => line.includes(`Year ${currentYear}`)) - 1;
-	
+
+			let yearReplaceIndex =
+				lines.findIndex(line => line.includes(`Year ${currentYear}`)) -
+				1;
+
 			if (yearReplaceIndex < 0) {
 				// Find position...
 				let yearInsertIndex = -1;
 				for (let index = 0; index < lines.length; index++) {
 					const [left, right] = lines[index].split("Year ");
 					if (right != undefined) {
-						if ( Number(right) < currentYear ) {
+						if (Number(right) < currentYear) {
 							yearInsertIndex = index - 1;
 							break;
 						}
@@ -100,12 +119,11 @@ const renderGlobalYearInfo = (config: YearConfig) => {
 
 				if (yearInsertIndex > -1) {
 					yearReplaceIndex = yearInsertIndex;
-				}
-				else {
+				} else {
 					yearReplaceIndex = lines.length;
 				}
 				lines.splice(yearReplaceIndex, 0, ...["", "", "", "", "", ""]);
-			}			
+			}
 
 			const yearInfo = [
 				"```",
@@ -113,8 +131,8 @@ const renderGlobalYearInfo = (config: YearConfig) => {
 				`Total stars: ${totalStars}/50`,
 				`Total time: ${toFixed(totalTime)}ms`,
 				"```",
-				""
-			]
+				"",
+			];
 
 			lines.splice(yearReplaceIndex, 6, ...yearInfo);
 
@@ -126,23 +144,25 @@ const renderGlobalYearInfo = (config: YearConfig) => {
 
 		return { badges, results };
 	} catch (error) {
-		if ( ( error as Error ).message.indexOf( "no such file or directory" ) == -1 ) {
-			console.error({ error });		
+		if (
+			(error as Error).message.indexOf("no such file or directory") == -1
+		) {
+			console.error({ error });
 		}
 		return undefined;
 	}
-}
+};
 
 const readmeMD = (
-  { language }: Setup,
-  startCmd: string,
-  installCmd: string
+	{ language }: Setup,
+	startCmd: string,
+	installCmd: string,
 ) => {
-  const lang = language === "ts" ? "TypeScript" : "JavaScript"
-  const yearBadges = ""
-  const results = ""
-  
-  return stripIndents`
+	const lang = language === "ts" ? "TypeScript" : "JavaScript";
+	const yearBadges = "";
+	const results = "";
+
+	return stripIndents`
     <!-- Entries between SOLUTIONS and RESULTS tags are auto-generated -->
 
     [![Node](https://badgen.net/badge/Node/v16.13.0+/blue)](https://nodejs.org/en/download/)
@@ -194,8 +214,8 @@ const readmeMD = (
     ---
 
     ✨🎄🎁🎄🎅🎄🎁🎄✨
-  `
-}
+  `;
+};
 
-export { renderGlobalYearInfo }
-export default readmeMD
+export { renderGlobalYearInfo };
+export default readmeMD;
