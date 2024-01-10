@@ -28,6 +28,17 @@
 			}
 		},
 		{
+			"label": "publish",
+			"type": "shell",
+			"command": "npm publish",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			}
+		},
+		{
 			"label": "format code",
 			"type": "shell",
 			"command": "./node_modules/.bin/prettier -w src",
