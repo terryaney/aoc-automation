@@ -14,7 +14,8 @@
 				"panel": "shared",
 				"showReuseMessage": true,
 				"clear": true
-			}
+			},
+			"problemMatcher": []
 		},
 		{
 			"label": "dev",
@@ -25,7 +26,8 @@
 				"panel": "shared",
 				"showReuseMessage": true,
 				"clear": true
-			}
+			},
+			"problemMatcher": []
 		},
 		{
 			"label": "publish",
@@ -36,13 +38,14 @@
 				"panel": "shared",
 				"showReuseMessage": true,
 				"clear": true
-			}
+			},
+			"problemMatcher": []
 		},
 		{
 			"label": "format code",
 			"type": "shell",
 			"command": "./node_modules/.bin/prettier -w src",
-            "problemMatcher": [],			
-		}		
+			"problemMatcher": [],
+		}
 	]
 }
