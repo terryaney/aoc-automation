@@ -123,7 +123,7 @@ const getPuzzleInfo = async (year: number, day: number) => {
 
 		if (part2 != undefined) {
 			matches = part2.match(/<pre><code>(.*?)<\/code><\/pre>/s);
-			testData2 = matches ? matches[1].trim() : null;
+			testData2 = matches ? matches[1].trim() : testData;
 	
 			matches = part2.match(/<code><em>(.*?)<\/em><\/code>/gs);
 			expected2 = matches ? matches[matches.length - 1].match(/<em>(.*?)<\/em>/)![1].trim() : "0";

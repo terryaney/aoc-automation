@@ -30,5 +30,7 @@
  *
  */
 
-export const parseLines = (rawInput: string): Array<string> =>
-	rawInput.split("\n");
+export const parseLines = (rawInput: string): Array<string> => rawInput.split("\n");
+
+export const parseLinesIntoArrays = (rawInput: string, lineSplit: string, toNumber: boolean = false): Array<Array<string | number>> =>
+	parseLines(rawInput).map((line) => line.split(lineSplit).map((x) => toNumber ? Number(x) : x));
