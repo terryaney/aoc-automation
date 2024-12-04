@@ -227,7 +227,7 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
 		console.log("Creating from template...");
 		copy(fromDir, toDir);
 
-		const [title, testData] = await getPuzzleInfo(
+		const [title, testData, expected] = await getPuzzleInfo(
 			yearNum,
 			dayNum,
 			inputPath,
@@ -237,9 +237,11 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
 			const dayIndexFile = path.join(toDir, "index.ts");
 			if (fs.existsSync(toDir)) {
 				let dayIndexContent = fs.readFileSync(dayIndexFile).toString();
+
 				if (testData != null) {
-					const regex = /([ \t]*)\{testData\}/;
-					const match = dayIndexContent.match(regex);
+					let saveFile = false;
+					let regex = /([ \t]*)\{testData\}/;
+					let match = dayIndexContent.match(regex);
 					if (match) {
 						const indent = match[1];
 						const testDataIndented = testData
@@ -251,6 +253,19 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
 							regex,
 							testDataIndented,
 						);
+						saveFile = true;
+					}
+
+					if (expected != null) {
+						regex = /\{expected\}/;
+						match = dayIndexContent.match(regex);
+						if (match) {
+						dayIndexContent = dayIndexContent.replace(regex, expected);
+						saveFile = true;
+						}
+					}
+
+					if (saveFile) {
 						fs.writeFileSync(dayIndexFile, dayIndexContent);
 					}
 				}

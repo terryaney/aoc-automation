@@ -22,3 +22,5 @@
  *     import myLib from '../utils/myLib'
  *     import { myUtil } from '../utils'
  */
+
+export const parseLines = (rawInput) => rawInput.split("\n");

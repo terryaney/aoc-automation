@@ -106,15 +106,21 @@ const getPuzzleInfo = async (year: number, day: number, path: string) => {
 		// Extract the content of the h2 element using a regular expression
 		let matches = body.match(/<h2>--- Day \d+: (.*?) ---<\/h2>/);
 		const title = matches ? matches[1] : null;
+		
 		if (body.indexOf("For example:") > -1) {
 			body = body.split("For example:")[1];
 		}
+		
 		matches = body.match(/<pre><code>(.*?)<\/code><\/pre>/s);
 		const testData = matches ? matches[1].trim() : null;
-		return [title, testData];
+
+		matches = body.match(/<code><em>(.*?)<\/em><\/code>/gs);
+		const expected = matches ? matches[matches.length - 1].match(/<em>(.*?)<\/em>/)![1].trim() : "0";
+			
+		return [title, testData, expected];
 	} catch (error) {
 		handleErrors(error as Error);
-		return [null, null];
+		return [null, null, null];
 	}
 };
 

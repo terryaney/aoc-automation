@@ -29,3 +29,6 @@
  *     import { myUtil } from '../utils'
  *
  */
+
+export const parseLines = (rawInput: string): Array<string> =>
+	rawInput.split("\n");
