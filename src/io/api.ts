@@ -1,7 +1,8 @@
 import fetch from "node-fetch";
 import { JSDOM } from "jsdom";
-import { writeFileSync, existsSync, statSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, statSync } from "fs";
 import kleur from "kleur";
+import { Config } from "../types/common";
 
 const USER_AGENT_HEADER = {
 	"User-Agent":
@@ -87,7 +88,7 @@ const handleErrors = (e: Error) => {
 	return Status["ERROR"];
 };
 
-const getPuzzleInfo = async (year: number, day: number, path: string) => {
+const getPuzzleInfo = async (year: number, day: number) => {
 	const API_URL = process.env.AOC_API ?? "https://adventofcode.com";
 
 	try {
@@ -102,56 +103,165 @@ const getPuzzleInfo = async (year: number, day: number, path: string) => {
 			throw new Error(String(res.status));
 		}
 
-		let body = await res.text();
+		let part1 = await res.text();
 		// Extract the content of the h2 element using a regular expression
-		let matches = body.match(/<h2>--- Day \d+: (.*?) ---<\/h2>/);
+		let matches = part1.match(/<h2>--- Day \d+: (.*?) ---<\/h2>/);
 		const title = matches ? matches[1] : null;
 		
-		if (body.indexOf("For example:") > -1) {
-			body = body.split("For example:")[1];
-		}
-		
-		matches = body.match(/<pre><code>(.*?)<\/code><\/pre>/s);
+		const starParts = part1.split("--- Part Two ---");
+		part1 = starParts[0];
+		const part2 = starParts.length == 2 ? starParts[1] : undefined;
+
+		matches = part1.match(/<pre><code>(.*?)<\/code><\/pre>/s);
 		const testData = matches ? matches[1].trim() : null;
 
-		matches = body.match(/<code><em>(.*?)<\/em><\/code>/gs);
+		matches = part1.match(/<code><em>(.*?)<\/em><\/code>/gs);
 		const expected = matches ? matches[matches.length - 1].match(/<em>(.*?)<\/em>/)![1].trim() : "0";
-			
-		return [title, testData, expected];
+		
+		let testData2: string | null = null;
+		let expected2: string | null = null;
+
+		if (part2 != undefined) {
+			matches = part2.match(/<pre><code>(.*?)<\/code><\/pre>/s);
+			testData2 = matches ? matches[1].trim() : null;
+	
+			matches = part2.match(/<code><em>(.*?)<\/em><\/code>/gs);
+			expected2 = matches ? matches[matches.length - 1].match(/<em>(.*?)<\/em>/)![1].trim() : "0";
+		}
+
+		return [title, testData, expected, testData2, expected2];
 	} catch (error) {
 		handleErrors(error as Error);
-		return [null, null, null];
+		return [null, null, null, null, null];
 	}
 };
 
-const getInput = async (year: number, day: number, path: string) => {
+const getInput = async (year: number, day: number, inputFilePath: string, dayIndexFilePath: string, puzzleInfo: (string | null)[]) => {
 	const API_URL = process.env.AOC_API ?? "https://adventofcode.com";
 
-	if (existsSync(path) && statSync(path).size > 0) {
-		console.log(
-			kleur.yellow(`INPUT FOR AOC ${year} DAY ${day} ALREADY FETCHED`),
-		);
-		return;
+	if (existsSync(inputFilePath) && statSync(inputFilePath).size > 0) {
+		console.log(kleur.yellow(`INPUT DATA FOR AOC ${year} DAY ${day} ALREADY FETCHED`));
 	}
-
-	fetch(`${API_URL}/${year}/day/${day}/input`, {
-		headers: {
-			cookie: `session=${process.env.AOC_SESSION_KEY}`,
-			...USER_AGENT_HEADER,
-		},
-	})
-		.then(res => {
+	else {
+		try {
+			const res = await fetch(`${API_URL}/${year}/day/${day}/input`, {
+				headers: {
+					cookie: `session=${process.env.AOC_SESSION_KEY}`,
+					...USER_AGENT_HEADER,
+				},
+			});
+	
 			if (res.status !== 200) {
 				throw new Error(String(res.status));
 			}
+	
+			const body = await res.text();
+	
+			writeFileSync(inputFilePath, body.replace(/\n$/, ""));
+			console.log(kleur.green(`INPUT DATA FOR AOC ${year} DAY ${day} SAVED!`));
+		} catch (error) {
+			handleErrors(error as Error);			
+		}
+	}
+	
+	if (puzzleInfo != undefined) {
+		const [_, testData1, expected1, testData2, expected2] = puzzleInfo;
 
-			return res.text();
-		})
-		.then(body => {
-			writeFileSync(path, body.replace(/\n$/, ""));
-			console.log(kleur.green(`INPUT FOR AOC ${year} DAY ${day} SAVED!`));
-		})
-		.catch(handleErrors);
+		if (testData1 == null) {
+			console.log(kleur.yellow(`TEST CASE DATA FOR AOC ${year} DAY ${day} NOT AVAILABLE`));
+		}
+		else {
+			if (existsSync(dayIndexFilePath)) {
+				let dayIndexContent = readFileSync(dayIndexFilePath).toString();
+				if (dayIndexContent.indexOf("{testData") == -1 && dayIndexContent.indexOf("{expected") == -1) {
+					console.log(kleur.yellow(`TEST CASES FOR AOC ${year} DAY ${day} ALREADY INSERTED`));
+				}
+				else {
+					let saveFile = false;
+					let regex = /([ \t]*)\{testData\}/;
+					let match = dayIndexContent.match(regex);
+					let testCaseInserted = false;
+					
+					if (match) {
+						const indent = match[1];
+						const testDataIndented = testData1
+							.split("\n")
+							.filter(l => l != "")
+							.map(line => `${indent}${line}`)
+							.join("\n");
+						dayIndexContent = dayIndexContent.replace(
+							regex,
+							testDataIndented,
+						);
+						saveFile = true;
+						testCaseInserted = true;
+					}
+	
+					if (expected1 != null) {
+						regex = /"\{expected\}"/;
+						match = dayIndexContent.match(regex);
+						if (match) {
+							dayIndexContent = dayIndexContent.replace(regex, expected1);
+							saveFile = true;
+							testCaseInserted = true;
+						}
+					}
+
+					if (!testCaseInserted) {
+						console.log(kleur.yellow(`TEST CASE FOR AOC ${year} DAY ${day} PART 1 ALREADY INSERTED`));
+					}
+					else {
+						console.log(kleur.green(`TEST CASE FOR AOC ${year} DAY ${day} PART 1 HAS BEEN INSERTED!`));
+					}
+
+					testCaseInserted = testData2 == null && expected2 == null;
+	
+					if (testData2 != null) {
+						regex = /([ \t]*)\{testDataPending\}/;
+						match = dayIndexContent.match(regex);
+						
+						if (match) {
+							const indent = match[1];
+							const testDataIndented = testData2
+								.split("\n")
+								.filter(l => l != "")
+								.map(line => `${indent}${line}`)
+								.join("\n");
+							dayIndexContent = dayIndexContent.replace(
+								regex,
+								testDataIndented,
+							);
+	
+							dayIndexContent = dayIndexContent.replace("testsPending:", "tests:");						
+							saveFile = true;
+							testCaseInserted = true;
+						}
+					}
+	
+					if (expected2 != null) {
+						regex = /"\{expectedPending\}"/;
+						match = dayIndexContent.match(regex);
+						if (match) {
+							dayIndexContent = dayIndexContent.replace(regex, expected2);
+							saveFile = true;
+							testCaseInserted = true;
+						}
+					}
+
+					if (!testCaseInserted) {
+						console.log(kleur.yellow(`TEST CASE FOR AOC ${year} DAY ${day} PART 2 ALREADY INSERTED`));
+					}
+					else if ( testData2 != null || expected2 != null) {
+						console.log(kleur.green(`TEST CASE FOR AOC ${year} DAY ${day} PART 2 HAS BEEN INSERTED!`));
+					}
+					
+					if (saveFile) {
+						writeFileSync(dayIndexFilePath, dayIndexContent);
+					}
+				}
+			}
+		}
+	}
 };
 
 const sendSolution = (

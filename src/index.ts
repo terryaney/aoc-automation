@@ -24,6 +24,7 @@ type Solutions = {
 	part2?: {
 		solution: Solution;
 		tests?: Tests;
+		testsPending?: Tests;
 	};
 	trimTestInputs?: boolean;
 	onlyTests?: boolean;
@@ -46,7 +47,7 @@ const runTests = async (
 		const result = await solution(data, testName);
 
 		if (result === expected) {
-			console.log(kleur.green(`${testName} - passed`));
+			console.log(kleur.green(`${testName} - passed with result: ${result}`));
 		} else {
 			console.log(kleur.red(`${testName} - failed`));
 			console.log(`\nResult:`);

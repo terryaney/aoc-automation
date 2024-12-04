@@ -2,17 +2,16 @@ import run from "aoc-automation"
 
 const parseInput = (rawInput) => rawInput
 
-const part1 = (rawInput) => {
-	const input = parseInput(rawInput)
+const solve = (rawInput, isPart1) => {
+	const input = parseInput(rawInput);
 
-	return
-}
+	if (isPart1) {
+	} else {
+	}
+};
 
-const part2 = (rawInput) => {
-	const input = parseInput(rawInput)
-
-	return
-}
+const part1 = (rawInput) => solve(rawInput, true);
+const part2 = (rawInput) => solve(rawInput, false);
 
 run({
 	part1: {
@@ -21,20 +20,22 @@ run({
 				input: `
 				{testData}
 				`,
-				expected: {expected}
+				expected: "{expected}"
 			},
 		],
 		solution: part1,
 	},
 	part2: {
-		tests: [
-			// {
-			//   input: ``,
-			//   expected: "",
-			// },
+		testsPending: [
+			{
+				input: `
+				{testDataPending}
+				`,
+				expected: "{expectedPending}"
+			},
 		],
 		solution: part2,
 	},
 	trimTestInputs: true,
-	onlyTests: false,
+	onlyTests: true
 })

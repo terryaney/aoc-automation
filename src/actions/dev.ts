@@ -223,54 +223,12 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
 	}
 
 	const toExists = fs.existsSync(toDir);
+	const puzzleInfo = await getPuzzleInfo(yearNum, dayNum);
+	const [title, _, __, ___, ____] = puzzleInfo;
+	
 	if (!toExists) {
 		console.log("Creating from template...");
 		copy(fromDir, toDir);
-
-		const [title, testData, expected] = await getPuzzleInfo(
-			yearNum,
-			dayNum,
-			inputPath,
-		);
-
-		if (config.language === "ts") {
-			const dayIndexFile = path.join(toDir, "index.ts");
-			if (fs.existsSync(toDir)) {
-				let dayIndexContent = fs.readFileSync(dayIndexFile).toString();
-
-				if (testData != null) {
-					let saveFile = false;
-					let regex = /([ \t]*)\{testData\}/;
-					let match = dayIndexContent.match(regex);
-					if (match) {
-						const indent = match[1];
-						const testDataIndented = testData
-							.split("\n")
-							.filter(l => l != "")
-							.map(line => `${indent}${line}`)
-							.join("\n");
-						dayIndexContent = dayIndexContent.replace(
-							regex,
-							testDataIndented,
-						);
-						saveFile = true;
-					}
-
-					if (expected != null) {
-						regex = /\{expected\}/;
-						match = dayIndexContent.match(regex);
-						if (match) {
-						dayIndexContent = dayIndexContent.replace(regex, expected);
-						saveFile = true;
-						}
-					}
-
-					if (saveFile) {
-						fs.writeFileSync(dayIndexFile, dayIndexContent);
-					}
-				}
-			}
-		}
 
 		fs.writeFileSync(inputPath, "");
 
@@ -286,7 +244,8 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
 		}
 	}
 
-	getInput(configYear.year, dayNum, inputPath);
+	const dayIndexFile = path.join(toDir, config.language == "ts" ? "index.ts" : "index.js");
+	getInput(yearNum, dayNum, inputPath, dayIndexFile, puzzleInfo);
 
 	if (toExists) {
 		const files = getAllFiles(path.join("src", year));
@@ -332,8 +291,10 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
 		switch (command.toLowerCase()) {
 			case "fetch":
 			case "f":
-				getInput(yearNum, dayNum, inputPath);
+				const puzzleInfo = await getPuzzleInfo( yearNum, dayNum );
+				getInput(yearNum, dayNum, inputPath, dayIndexFile, puzzleInfo);
 				break;
+			
 			case "send":
 			case "s":
 				const solved = await send(config, yearNum, dayNum, 1);
