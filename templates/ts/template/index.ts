@@ -7,16 +7,24 @@ const parseInput = (rawInput: string) => {
 	return lines;
 };
 
-const solve = (rawInput: string, isPart1: boolean) => {
+const solve = (rawInput: string, isPart1: boolean, testName?: string) => {
 	const input = parseInput(rawInput);
+
+	if (testName != undefined) {
+		console.log("");
+		console.log("------");
+		console.log(`${testName} Input`);
+		console.log(input);
+		console.log("------");
+	}
 
 	if (isPart1) {
 	} else {
 	}
 };
 
-const part1 = (rawInput: string) => solve(rawInput, true);
-const part2 = (rawInput: string) => solve(rawInput, false);
+const part1 = (rawInput: string, testName?: string) => solve(rawInput, true, testName);
+const part2 = (rawInput: string, testName?: string) => solve(rawInput, false, testName);
 
 run({
 	part1: {

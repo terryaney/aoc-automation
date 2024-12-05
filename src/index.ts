@@ -24,7 +24,7 @@ type Solutions = {
 	part2?: {
 		solution: Solution;
 		tests?: Tests;
-		testsPending?: Tests;
+		testsPending?: Tests; // Only used so I can rename after fetching tests for part 2.
 	};
 	trimTestInputs?: boolean;
 	onlyTests?: boolean;
