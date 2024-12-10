@@ -1,6 +1,5 @@
 import run from "aoc-automation"
-
-const parseInput = (rawInput) => rawInput
+import * as util from "../../utils/index.js";
 
 const solve = (rawInput, isPart1) => {
 	const input = parseInput(rawInput);
@@ -9,6 +8,11 @@ const solve = (rawInput, isPart1) => {
 	} else {
 	}
 };
+
+const parseInput = (rawInput) => {
+	const lines = util.parseLines(rawInput);
+	return lines;
+}
 
 const part1 = (rawInput) => solve(rawInput, true);
 const part2 = (rawInput) => solve(rawInput, false);
