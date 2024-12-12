@@ -1,6 +1,6 @@
 {
   "name": "aoc-automation",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "repository": "https://github.com/terryaney/aoc-automation",
   "description": "Advent of Code tool to automate the repetitive parts of AoC.",
   "main": "lib/index.js",

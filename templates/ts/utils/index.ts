@@ -37,16 +37,22 @@ export const parseLinesIntoArrays = (rawInput: string, lineSplit: string, toNumb
 
 export const parseGrid = (rawInput: string): Array<Array<string>> => rawInput.split("\n").map(l => l.split(""));
 
-export const logGrid = (grid: Array<Array<string>>, title?: string): void => {
+export const logGrid = <T>(grid: Array<Array<T>>, title?: string): void => {
 	console.log(title || "");
 	const rows = grid.length;
 	const cols = grid[0].length;
 	const rowDigits = String(rows - 1).length;
 	const colDigits = String(cols - 1).length;
 
-	console.log(`${" ".repeat(rowDigits)} ${Array.from({ length: cols }, (_, i) => i.toString().padStart(colDigits, "0") ).join(" ")}`);
+	console.log(`${" ".repeat(rowDigits)} | ${Array.from({ length: cols }, (_, i) => i.toString().padStart(colDigits, "0") ).join(" ")}`);
+	console.log(`${"-".repeat(rowDigits)}-${Array.from({ length: cols }, (_, i) => "-".padStart(colDigits, "-") ).join("-")}--`);
 	grid.forEach((row, i) => {
-		console.log(`${i.toString().padStart(rowDigits, "0")} ${row.map( v => " ".repeat(colDigits - 1) + v).join(" ")}`);
+		console.log(`${i.toString().padStart(rowDigits, "0")} | ${row.map( v => " ".repeat(colDigits - 1) + v).join(" ")}`);
 	});
 	console.log("")
 };
+
+export const movementDeltas = (includeDiagonals?: boolean): Array<[number, number]> =>
+	includeDiagonals
+		? [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
+		: [[-1, 0], [1, 0], [0, -1], [0, 1]];
