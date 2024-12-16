@@ -35,24 +35,33 @@ export const parseLines = (rawInput: string): Array<string> => rawInput.split("\
 export const parseLinesIntoArrays = (rawInput: string, lineSplit: string, toNumber: boolean = false): Array<Array<string | number>> =>
 	parseLines(rawInput).map((line) => line.split(lineSplit).map((x) => toNumber ? Number(x) : x));
 
-export const parseGrid = (rawInput: string): Array<Array<string>> => rawInput.split("\n").map(l => l.split(""));
-
-export const logGrid = <T>(grid: Array<Array<T>>, title?: string): void => {
-	console.log(title || "");
-	const rows = grid.length;
-	const cols = grid[0].length;
-	const rowDigits = String(rows - 1).length;
-	const colDigits = String(cols - 1).length;
-
-	console.log(`${" ".repeat(rowDigits)} | ${Array.from({ length: cols }, (_, i) => i.toString().padStart(colDigits, "0") ).join(" ")}`);
-	console.log(`${"-".repeat(rowDigits)}-${Array.from({ length: cols }, (_, i) => "-".padStart(colDigits, "-") ).join("-")}--`);
-	grid.forEach((row, i) => {
-		console.log(`${i.toString().padStart(rowDigits, "0")} | ${row.map( v => " ".repeat(colDigits - 1) + v).join(" ")}`);
-	});
-	console.log("")
-};
-
 export const movementDeltas = (includeDiagonals?: boolean): Array<[number, number]> =>
 	includeDiagonals
 		? [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
 		: [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+type Point<TValue> = { x: number, y: number, value: TValue, visited: boolean };
+type Grid<TValue> = { points: Array<Array<Point<TValue>>>, rows: number, cols: number };
+
+export const parseGrid = <TValue = string>(rawInput: string, convert?: (value: string) => TValue, visited?: (value: string) => boolean): Grid<TValue> => {
+	const convertFn = convert ?? ((value: string) => value as unknown as TValue);
+	const visitedFn = visited ?? ((value: string) => false);
+	const points = rawInput.split("\n").map((row, y) => row.split("").map((cell, x) => ({ x, y, value: convertFn(cell), visited: visitedFn(cell) })));
+	return { points, rows: points.length, cols: points[0].length };
+} 
+
+export const logGrid = <TValue>(grid: Grid<TValue>, title?: string): void => {
+	console.log(title || "");
+	const rows = grid.rows;
+	const cols = grid.cols;
+	const rowDigits = String(rows - 1).length;
+	const colDigits = String(cols - 1).length;
+
+	// TODO: Should get max toString length of values to know how wide to make each col
+	console.log(`${" ".repeat(rowDigits)} | ${Array.from({ length: cols }, (_, i) => i.toString().padStart(colDigits, "0") ).join(" ")}`);
+	console.log(`${"-".repeat(rowDigits)}-${Array.from({ length: cols }, (_, i) => "-".padStart(colDigits, "-") ).join("-")}--`);
+	grid.points.forEach((row, y) => {
+		console.log(`${y.toString().padStart(rowDigits, "0")} | ${row.map( cell => " ".repeat(colDigits - 1) + cell.value).join(" ")}`);
+	});
+	console.log("")
+};
