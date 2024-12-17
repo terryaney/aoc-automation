@@ -19,12 +19,28 @@ export const parseLinesIntoArrays = (rawInput, lineSplit, toNumber = false) =>
 /**
  * Returns an array of movement deltas for grid navigation.
  * @param {boolean} [includeDiagonals=false] - Whether to include diagonal movements.
- * @returns {Array<[number, number]>} An array of movement deltas.
+ * @returns {Array<MovementDelta>} An array of movement deltas.
  */
 export const movementDeltas = (includeDiagonals) => 
     includeDiagonals
-        ? [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
-        : [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        ? [{ dx: -1, dy: -1, name: "NW" }, { dx: -1, dy: 0, name: "W" }, { dx: -1, dy: 1, name: "SW" }, { dx: 0, dy: -1, name: "S" }, { dx: 0, dy: 1, name: "N" }, { dx: 1, dy: -1, name: "SE" }, { dx: 1, dy: 0, name: "E" }, { dx: 1, dy: 1, name: "NE" }]
+        : [{ dx: -1, dy: 0, name: "W" }, { dx: 1, dy: 0, name: "E" }, { dx: 0, dy: -1, name: "N" }, { dx: 0, dy: 1, name: "S" }];
+
+/**
+ * @typedef {Object} Point
+ * @property {number} x - The x-coordinate of the point.
+ * @property {number} y - The y-coordinate of the point.
+ * @property {TValue} value - The value of the point.
+ * @property {boolean} visited - Whether the point has been visited.
+ */
+
+/**
+ * @typedef {Object} Grid
+ * @property {Array<Array<Point<TValue>>>} points - The grid points.
+ * @property {number} rows - The number of rows in the grid.
+ * @property {number} cols - The number of columns in the grid.
+ * @property {(point: Array<number>) => boolean} isInside - Function to check if a point is inside the grid.
+ */
 
 /**
  * Parses the raw input string into a grid of points.
@@ -45,7 +61,12 @@ export const parseGrid = (rawInput, convert, visited) => {
             visited: visitedFn(cell)
         }))
     );
-    return { points, rows: points.length, cols: points[0].length };
+    return {
+        points,
+        rows: points.length,
+        cols: points[0].length,
+        isInside: ([x, y]) => x >= 0 && x < points[0].length && y >= 0 && y < points.length
+    };
 };
 
 /**
@@ -55,15 +76,15 @@ export const parseGrid = (rawInput, convert, visited) => {
  * @param {string} [title] - The optional title to display.
  */
 export const logGrid = (grid, title) => {
-    console.log(title || "");
+    console.log((title || "") + "\n");
     const rows = grid.rows;
     const cols = grid.cols;
     const rowDigits = String(rows - 1).length;
     const colDigits = String(cols - 1).length;
-    console.log(`${" ".repeat(rowDigits)} | ${Array.from({ length: cols }, (_, i) => i.toString().padStart(colDigits, "0")).join(" ")}`);
-    console.log(`${"-".repeat(rowDigits)}-${Array.from({ length: cols }, (_, i) => "-".padStart(colDigits, "-")).join("-")}--`);
+    const maxCellSpace = Math.max(colDigits, grid.points.flat().reduce((max, cell) => Math.max(max, String(cell.value).length + 1), 0));
+    console.log(`${" ".repeat(rowDigits)} | ${Array.from({ length: cols }, (_, i) => i.toString().padStart(colDigits, "0").padStart(maxCellSpace, " ")).join(" ")}`);
+    console.log(`${"-".repeat(rowDigits)}-${Array.from({ length: cols }, (_, i) => "-".padStart(maxCellSpace, "-")).join("-")}--`);
     grid.points.forEach((row, y) => {
-        console.log(`${y.toString().padStart(rowDigits, "0")} | ${row.map(cell => " ".repeat(colDigits - 1) + cell.value).join(" ")}`);
+        console.log(`${y.toString().padStart(rowDigits, "0")} | ${row.map(cell => " ".repeat(maxCellSpace - 2) + (cell.visited ? "*" : " ") + cell.value).join(" ")}`);
     });
-    console.log("");
 };

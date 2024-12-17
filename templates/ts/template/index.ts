@@ -12,9 +12,11 @@ const solve = (rawInput: string, isPart1: boolean, testName?: string) => {
 		console.log("------");
 	}
 
-	if (isPart1) {
-	} else {
-	}
+	let total = 0;
+
+	// Code solution here...
+
+	return total;
 };
 
 const parseInput = (rawInput: string) => {

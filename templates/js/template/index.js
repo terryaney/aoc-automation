@@ -4,9 +4,11 @@ import * as util from "../../utils/index.js";
 const solve = (rawInput, isPart1) => {
 	const input = parseInput(rawInput);
 
-	if (isPart1) {
-	} else {
-	}
+	let total = 0;
+
+	// Code solution here...
+
+	return total;
 };
 
 const parseInput = (rawInput) => {
