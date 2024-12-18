@@ -256,6 +256,9 @@ const getInput = async (year: number, day: number, inputFilePath: string, dayInd
 					}
 					
 					if (saveFile) {
+						if (testCaseInserted) {
+							dayIndexContent = dayIndexContent.replace("1 == 1 ? 0 : solve(rawInput, false, testName);", "solve(rawInput, false, testName);");
+						}
 						writeFileSync(dayIndexFilePath, dayIndexContent);
 					}
 				}

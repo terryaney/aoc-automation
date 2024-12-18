@@ -4,7 +4,7 @@ import * as util from "../../utils/index.js";
 const solve = (rawInput: string, isPart1: boolean, testName?: string) => {
 	const input = parseInput(rawInput);
 
-	if (testName != undefined) {
+	if (isPart1 && testName != undefined) {
 		console.log("");
 		console.log("------");
 		console.log(`${testName} Input`);
@@ -25,7 +25,7 @@ const parseInput = (rawInput: string) => {
 };
 
 const part1 = (rawInput: string, testName?: string) => solve(rawInput, true, testName);
-const part2 = (rawInput: string, testName?: string) => solve(rawInput, false, testName);
+const part2 = (rawInput: string, testName?: string) => 1 == 1 ? 0 : solve(rawInput, false, testName);
 
 run({
 	part1: {
