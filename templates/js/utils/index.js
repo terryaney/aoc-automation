@@ -3,7 +3,7 @@
  * @param {string} rawInput - The raw input string.
  * @returns {Array<string>} - The array of lines.
  */
-export const parseLines = (rawInput) => rawInput.split("\n");
+const parseLines = (rawInput) => rawInput.split("\n");
 
 /**
  * Parses the raw input into an array of arrays, splitting each line by the specified delimiter.
@@ -12,7 +12,7 @@ export const parseLines = (rawInput) => rawInput.split("\n");
  * @param {boolean} [toNumber=false] - Whether to convert the split values to numbers.
  * @returns {Array<Array<string | number>>} - The array of arrays.
  */
-export const parseLinesIntoArrays = (rawInput, lineSplit, toNumber = false) => 
+const parseLinesIntoArrays = (rawInput, lineSplit, toNumber = false) => 
     parseLines(rawInput).map((line) => 
         line.split(lineSplit).map((x) => toNumber ? Number(x) : x)
     );
@@ -20,7 +20,7 @@ export const parseLinesIntoArrays = (rawInput, lineSplit, toNumber = false) =>
 /**
  * Represents movement directions and their opposites.
  */
-export class Movement {
+class Movement {
     static opposites = {
         "N": "S",
         "S": "N",
@@ -73,7 +73,7 @@ export class Movement {
  * @param {function(string): boolean} [visited] - The function to determine if a point is visited.
  * @returns {Grid<TValue>} - The parsed grid.
  */
-export const parseGrid = (rawInput, convert, visited) => {
+const parseGrid = (rawInput, convert, visited) => {
     const convertFn = convert ?? ((value) => value);
     const visitedFn = visited ?? ((value) => false);
     const points = rawInput.split("\n").map((row, y) => 
@@ -102,7 +102,7 @@ export const parseGrid = (rawInput, convert, visited) => {
  * @param {Grid<TValue>} grid - The grid to log.
  * @param {string} [title] - The title to display above the grid.
  */
-export const logGrid = (grid, title) => {
+const logGrid = (grid, title) => {
     console.log((title || "") + "\n");
     const rows = grid.rows;
     const cols = grid.cols;
@@ -132,7 +132,7 @@ export const logGrid = (grid, title) => {
  * @param {boolean} [includeAllPaths] - Whether to include all paths.
  * @returns {Array<Path> | undefined} - The found paths.
  */
-export const aStar = (grid, start, end, movementDeltas, movementCost = (_current, _neighbor) => 1, canMove = (neighbor) => grid.points[neighbor.y][neighbor.x].value != "#", includeAllPaths = false) => {
+const aStar = (grid, start, end, movementDeltas, movementCost = (_current, _neighbor) => 1, canMove = (neighbor) => grid.points[neighbor.y][neighbor.x].value != "#", includeAllPaths = false) => {
     start.costToFinish = manhattanDistance(start, end);
     let isStartMovement = true;
     const pathsFound = [];
@@ -202,7 +202,7 @@ const manhattanDistance = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 /**
  * Represents a path in the grid.
  */
-export class Path {
+class Path {
     nodes;
 
     /**
@@ -235,7 +235,7 @@ export class Path {
 /**
  * Represents a node in a path.
  */
-export class PathNode {
+class PathNode {
     x;
     y;
     costFromStart;
@@ -344,4 +344,15 @@ const getPaths = (node, alternateParents) => {
     }
     allPaths.push(new Path(path.reverse()));
     return allPaths;
+};
+
+export {
+    Movement,
+    Path,
+    PathNode,
+    aStar,
+    logGrid,
+    parseGrid,
+    parseLines,
+    parseLinesIntoArrays
 };

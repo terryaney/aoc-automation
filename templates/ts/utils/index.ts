@@ -144,7 +144,8 @@ export const aStar = <TValue = string>(
 	const openList = [start];
 	const closedList: Array<PathNode> = [];
 	const alternateParents: Record<string, Array<PathNode>> = {};
-	
+	const ouputDebugTrace = false && includeAllPaths && grid.cols > 100;
+
 	while (openList.length > 0) {
 		const currentNode = openList.reduce((minNode, node) => node.totalCost < minNode.totalCost ? node : minNode, openList[0]);
 		const currentIndex = openList.indexOf(currentNode);
@@ -172,22 +173,58 @@ export const aStar = <TValue = string>(
 
 		for (const neighbor of neighbors) {
 			if (!canMove(neighbor)) continue;
+
+			// Before I only searched for closed with same direction, but it never worked on 2024 Day 16 input data.
+			// I'd think the opposite direction condition would simply optimize the code (making less paths to check before
+			// ultimately finding a neighbor with same direction) vs fixing the issue.
+			// TODO: Later, I should run again on day 16 and see what alternates are different based on these conditions or if any are added when direction == opposite (I'd think cost to get there is worse)
+			// Main conditions I added to overcome issue of 490 nodes for part 2 (while all test cases passed):
+			//
+			// 1) Added `n.direction == Movement.getOppositeDirection(neighbor.direction)` in closedNeighbor assignment
+			// 2) If openNeighbor is found, use (includeAllPaths && costFromStart <= openNeighbor.costFromStart) to add neighbor to openList as another item to evaluate
+			// 3) Added `alternateParents[key].some(n => n.x == node.x && n.y == node.y)` in addAlternateParent to never add duplicates
+			// 4) In getPaths, made sure directions were going the same way
+			//
+			// Scenario 1: None of above, response: 2 paths, 490 nodes
+			// Scenario 2: Added openNeighbor using == costFromStart, response: 2 paths, 490 nodes
+			// Scenario 3: Changed openNeighbor to use <= costFromStart, response: 8 paths, 524 nodes
+			// Scenario 4: Changed closedNeighbor to use || n.direction == 'opposite', response: 4 paths, 511 nodes
+			// Scenario 5: Added check to addAlternateParent to not add duplicates, response: 4 paths, 511 nodes
+			// Scenario 6: Changed closedNeighbor to remove || n.direction == 'opposite', response: 8 paths, 524 nodes
+			// Scenario 7: In getPaths made sure directions where going same way, response: 4 paths, 511 nodes
+			// Scenario 8 (not used, see below): Changed addAlternateParent to allow duplicates, response: 4 paths, 511 nodes
+			// Scenario 9: Changed closedNeighbor to use || n.direction == 'opposite', response: 4 paths, 511 nodes
+			//
+			// Final analysis: Need openNeighbor to use <= costFromStart and in getPaths, make sure directions are going the same way.
+			//				   Also, for my input data, I didn't need to prevent duplicates in addAlternateParent because all items that were
+			//				   duplicated where not part of any valid paths, but adding as I think it would be a problem if ever hit.
+			//
+			// 				   So, Scenario 9 is what is needed.  It optimizes runtime b/c if a closed item of opposite direction is found, 
+			//				   the current neighbor will never be able to 'turn around' and score a better time, so it is flagged as 'closed'
+			//				   and processing for that node stops.
 			const closedNeighbor = closedList.find(n =>
-				n.x == neighbor.x && n.y == neighbor.y &&
-				(!includeAllPaths || n.direction == neighbor.direction || n.direction == Movement.getOppositeDirection(neighbor.direction))
+				n.x == neighbor.x && n.y == neighbor.y
+				// Scenario 4 / Scenario 6 / Scenario 9: 
+				&& (!includeAllPaths || n.direction == neighbor.direction || n.direction == Movement.getOppositeDirection(neighbor.direction))
+				// && (!includeAllPaths || n.direction == neighbor.direction)
 			);
 			const costFromStart = currentNode.costFromStart + movementCost(currentNode, neighbor);
 
 			if (closedNeighbor) {
 				if (includeAllPaths && costFromStart == closedNeighbor.costFromStart) {
-					addAlternateParent(closedNeighbor.clone(currentNode), alternateParents);
+					// Add parent if not already there...
+					addAlternateParent(closedNeighbor.clone(currentNode), alternateParents, ouputDebugTrace);
 				}
 				continue;
 			}
 
 			const openNeighbor = openList.find(n => n.x == neighbor.x && n.y == neighbor.y);
 
+			// Scenario 2:
+			// if (!openNeighbor || (includeAllPaths && costFromStart == openNeighbor.costFromStart)) {
+			// Scenario 3:
 			if (!openNeighbor || (includeAllPaths && costFromStart <= openNeighbor.costFromStart)) {
+			// if (!openNeighbor) {
 				neighbor.costFromStart = costFromStart;
 				neighbor.costToFinish = manhattanDistance(neighbor, end);
 				neighbor.parent = currentNode;
@@ -209,6 +246,13 @@ export const aStar = <TValue = string>(
 		allPaths.push(...getPaths(endPath, alternateParents));
 	}
 
+	if (ouputDebugTrace) {
+		console.log(`Found ${allPaths.length} paths`);
+		allPaths.forEach((p, i) => {
+			console.log(`Path ${i}, cost: ${p.nodes[p.nodes.length - 1].totalCost}`);
+			console.log(p.nodes.map(n => `${n.x},${n.y}`).join("->\n"))
+		});
+	}
 	return allPaths;
 };
 
@@ -266,13 +310,28 @@ const getNeighbors = <TValue = string>(grid: Grid<TValue>, node: PathNode, movem
 
 const serializeNode = (node?: PathNode) => `${node?.x},${node?.y}`;
 
-const addAlternateParent = (node: PathNode, alternateParents: Record<string, Array<PathNode>>) => {
+const addAlternateParent = (node: PathNode, alternateParents: Record<string, Array<PathNode>>, trace: boolean = false) => {
 	const key = serializeNode(node);
+
 	if (!alternateParents[key]) {
+		if (trace) {
+			console.log(`Adding ${node.x},${node.y},${node.direction}, count: 0, exists: false`);
+		}
 		alternateParents[key] = [node];
 		return;
 	}
-	if (alternateParents[key].some(n => n.x == node.x && n.y == node.y)) return;
+
+	// Scenario 5 / Scenario 8:
+	if (alternateParents[key].some(n => n.x == node.x && n.y == node.y)) {
+		return;
+	}
+
+	if (trace) {
+		const count = alternateParents[key] ? alternateParents[key].length : 0;
+		const exists = alternateParents[key] && alternateParents[key].some(n => n.x == node.x && n.y == node.y);
+		console.log(`Adding ${node.x},${node.y},${node.direction}, count: ${count}, exists: ${exists}`);
+	}
+
 	alternateParents[key].push(node);
 };
 
@@ -288,7 +347,10 @@ const getPaths = (node: PathNode, alternateParents: Record<string, Array<PathNod
 		
 		if (alternateParent) {
 			const pathToEnd = [...path].reverse();
+			// Scenario 7:
+			// for (const p of alternateParent.filter(n => n.direction == current!.direction)) {
 			for (const p of alternateParent) {
+
 				const alternatePaths = getPaths(p, alternateParents);
 				alternatePaths.forEach(p => allPaths.push(new Path([...p.nodes, ...pathToEnd])));
 			}
