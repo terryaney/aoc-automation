@@ -1,7 +1,7 @@
 import type { Setup, Config, DayConfig } from "../types/common";
 
-const aocAutomationDaysJSON = (): DayConfig[] =>
-	new Array(25).fill(0).map((_, i) => ({
+const aocAutomationDaysJSON = ({ year }: Setup): DayConfig[] =>
+	new Array(year >= 2025 ? 12 : 25).fill(0).map((_, i) => ({
 		title: null,
 		part1: {
 			solved: false,
@@ -29,7 +29,7 @@ const aocAutomationDataJSON = ({
 		years: [
 			{
 				year,
-				days: aocAutomationDaysJSON(),
+				days: aocAutomationDaysJSON({ year } as Setup),
 			},
 		],
 	};

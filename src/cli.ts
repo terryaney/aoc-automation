@@ -44,7 +44,7 @@ switch (String(command || "").toLowerCase()) {
 		break;
 	}
 	case "update:readme": {
-		updateReadmes(args[0]);
+		updateReadmes(args.length < 1 ? new Date().getFullYear().toString() : args[0]);
 		break;
 	}
 	default: {

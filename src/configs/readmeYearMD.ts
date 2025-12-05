@@ -3,12 +3,12 @@ import { stripIndents } from "common-tags";
 import toFixed from "../utils/toFixed.js";
 
 const renderYearDayBadges = (config: YearConfig) => {
+	const lastDay = config.days.length.toString();
 	return config.days
 		.map(({ part1, part2 }, index) => {
 			const day = String(index + 1).padStart(2, "0");
-
 			const color =
-				(part1.solved && part2.solved) || (part1.solved && day === "25")
+				(part1.solved && part2.solved) || (part1.solved && day === lastDay)
 					? "green"
 					: part1.solved || part2.solved
 					? "yellow"
@@ -17,7 +17,7 @@ const renderYearDayBadges = (config: YearConfig) => {
 			const badge = `![Day](https://badgen.net/badge/${day}/%E2%98%8${
 				part1.solved ? 5 : 6
 			}%E2%98%8${
-				part2.solved || (part1.solved && day === "25") ? 5 : 6
+				part2.solved || (part1.solved && day === lastDay) ? 5 : 6
 			}/${color})`;
 
 			return color !== "gray" ? `[${badge}](day${day})` : badge;
@@ -28,7 +28,7 @@ const renderYearDayBadges = (config: YearConfig) => {
 const renderYearResults = (config: YearConfig) => {
 	let totalTime = 0;
 	let totalStars = 0;
-
+	const lastDay = config.days.length.toString();
 	const results = config.days
 		.map(({ title, part1, part2 }, index) => {
 			const day = String(index + 1).padStart(2, "0");
@@ -46,7 +46,7 @@ const renderYearResults = (config: YearConfig) => {
 				timeBoth += part2.time ?? 0;
 			}
 
-			if (day === "25" && part1.solved) {
+			if (day === lastDay && part1.solved) {
 				totalStars++;
 			}
 

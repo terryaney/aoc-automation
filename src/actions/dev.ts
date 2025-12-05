@@ -16,7 +16,7 @@ import readmeYearMD from "../configs/readmeYearMD.js";
 import readmeDayMD from "../configs/readmeDayMD.js";
 import asciiPrompt, { AsciiOptions } from "../prompts/asciiPrompt.js";
 import commandPrompt from "../prompts/commandPrompt.js";
-import type { Config } from "../types/common";
+import type { Config, Setup } from "../types/common";
 import updateReadmes from "./updateReadMe.js";
 import version from "../version.js";
 
@@ -177,18 +177,20 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
 		);
 		process.exit(1);
 	}
-	if (dayNum < 1 || dayNum > 25) {
-		console.log(kleur.red("Wrong day - choose day between 1 and 25."));
-		process.exit(1);
-	}
 
 	let configYear = config.years.find(y => y.year == yearNum);
 
 	if (configYear == undefined) {
 		const yearDir = path.join("src", year);
+		const daysConfig = aocAutomationDaysJSON({ year: yearNum } as Setup);
+		if (dayNum < 1 || dayNum > daysConfig.length) {
+			console.log(kleur.red(`Wrong day - choose day between 1 and ${daysConfig.length}.`));
+			process.exit(1);
+		}
+
 		fs.mkdirSync(yearDir, { recursive: true });
 		config.years.push(
-			(configYear = { year: yearNum, days: aocAutomationDaysJSON() }),
+			(configYear = { year: yearNum, days: daysConfig }),
 		);
 		config.years.sort((a, b) => a.year - b.year);
 		saveConfig(config);
@@ -245,12 +247,14 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
 	}
 
 	const dayIndexFile = path.join(toDir, config.language == "ts" ? "index.ts" : "index.js");
+	const utilsIndex = path.join("src", "utils", "index.ts");
+	const utilsIndexOut = path.join("dist", "utils", "index.js");
 	getInput(yearNum, dayNum, inputPath, dayIndexFile, puzzleInfo);
 
 	if (toExists) {
-		const files = getAllFiles(path.join("src", year));
 		if (config.language === "ts") {
-			buildSource(year, files);
+			console.log(`Building ${dayIndexFile}...`);
+			buildSource(year, dayIndexFile);
 		}
 		runSolution(dayNum, indexFile);
 	}
@@ -263,6 +267,11 @@ const dev = async (yearRaw: string | undefined, dayRaw: string | undefined) => {
 		console.clear();
 
 		if (config.language === "ts") {
+			if (!fs.existsSync(utilsIndexOut)) {
+				console.log(`Building ${utilsIndex}...`);
+				buildSource(year!, utilsIndex);
+			}
+			console.log(`Building ${file}...`);
 			buildSource(year!, file);
 		}
 

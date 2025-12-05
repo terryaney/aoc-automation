@@ -7,6 +7,7 @@ const tsconfigJSON = ({ strict }: Setup) => {
 			module: "es2020",
 			removeComments: true,
 			declaration: true,
+			sourceMap: true,
 			outDir: "./dist",
 			preserveConstEnums: true,
 			strict,
